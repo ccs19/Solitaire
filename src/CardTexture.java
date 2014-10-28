@@ -77,18 +77,20 @@ public class CardTexture extends JLabel{
         imgIcon = new ImageIcon();
         ResizeImageListener();
 
-        this.addComponentListener(new ComponentAdapter() {
+
+        //Re-add later
+        /*this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentMoved(ComponentEvent e) {
                 ResizeImageListener();
             }
-        });
+        });*/
 
 
     }
 
 
-    private void ResizeImageListener() {
+    public void ResizeImageListener() {
 
         cardXSize = (int)(cardDimensionModifier * (double) gameWindow.getXSize()/cardRatioX);
         cardYSize = (int)(cardDimensionModifier * (double) gameWindow.getYSize() / cardRatioY);
@@ -101,6 +103,7 @@ public class CardTexture extends JLabel{
         setIcon(imgIcon);
         setSize(cardXSize,cardYSize);
     }
+
 
 
 
