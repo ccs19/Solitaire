@@ -1,10 +1,7 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -36,8 +33,8 @@ public class CardTexture extends JLabel{
             "king_of_clubs.png","king_of_diamonds.png","king_of_spades.png","king_of_hearts.png",
             "ace_of_clubs.png","ace_of_diamonds.png","ace_of_spades.png","ace_of_hearts.png"};
 
-    private static double defaultCardXSize = 500;
-    private static double defaultCardYSize = 726;
+    private static int defaultCardXSize = 500;
+    private static int defaultCardYSize = 726;
     private static double cardRatioX = 3.84;
     private static double cardRatioY = 1.65;
 
@@ -50,19 +47,33 @@ public class CardTexture extends JLabel{
     private static SolitaireWindow gameWindow;
 
     private static ImageIcon imgIcon;
+    private String cardName;
 
 
     CardTexture(int i, SolitaireWindow s){
         gameWindow = s;
         resizeCard(i);
+
     }
 
     private String getDir(int i){
         String pwd = System.getProperty("user.dir");
         System.out.println(pwd);
+        cardName = cardNames[i];
         return pwd + "/src/textures/" + cardNames[i];
     }
 
+    public String toString(){
+        return cardName;
+    }
+
+
+    public static int defaultCardX(){
+        return defaultCardXSize;
+    }
+    public static int defaultCardY(){
+        return defaultCardYSize;
+    }
 
 
     private void resizeCard(int i){
@@ -102,6 +113,19 @@ public class CardTexture extends JLabel{
         imgIcon.setImage(sizedImg);
         setIcon(imgIcon);
         setSize(cardXSize,cardYSize);
+    }
+
+    private class RedrawCard extends MouseAdapter {
+
+        @Override
+        public void mousePressed(MouseEvent m){
+        }
+
+        public void mouseDragged(MouseEvent m){
+            repaint();
+        }
+
+
     }
 
 

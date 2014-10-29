@@ -18,6 +18,8 @@ public class SolitaireWindow {
     private JMenuItem b;
     private static int[] monitorResolution = new int[2];
 
+
+
     private final GraphicsDevice g = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
 
@@ -51,7 +53,12 @@ public class SolitaireWindow {
 
         gameWindow.setBackground(Color.GREEN);
 
+        redrawPage rp = new redrawPage();
+        gameWindow.addMouseListener(rp);
+        gameWindow.addMouseMotionListener(rp);
         gameWindow.setVisible(true);
+
+
 
     }
 
@@ -124,5 +131,26 @@ public class SolitaireWindow {
     private void initNewGameButton(){}
     private void initSaveGameButton(){}
     private void initLoadGameButton(){}
+
+
+
+    private class redrawPage extends MouseAdapter{
+
+
+        @Override
+        public void mousePressed(MouseEvent m){
+            SwingUtilities.updateComponentTreeUI(gameWindow);
+            gameWindow.getContentPane().invalidate();
+            gameWindow.getContentPane().validate();
+            gameWindow.getContentPane().repaint();
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent m){
+            mousePressed(m);
+
+        }
+
+    }
 
 }

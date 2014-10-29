@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.CardLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -30,10 +31,23 @@ public class CardGrid extends JLayeredPane {
         backPanel.setLocation(2 * SPACE, 2 * SPACE);
         backPanel.setBackground(Color.WHITE);
         gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+
+
+
+        cardGrid[0][1] = new DiscardStack();
+        cardGrid[0][0] = new DrawStack(this, (DiscardStack)cardGrid[0][1]);
+        backPanel.add(cardGrid[0][0]);
+        backPanel.add(cardGrid[0][1]);
+
         for(int r = 0; r < ROWS; r++){
             for(int c = 0; c < COLUMNS; c++){
 
-                cardGrid[r][c] = new JPanel(new GridBagLayout());
+                //Don't add JPanel to special grids
+                if( r == 0 && c == 0 || r == 0 && c == 1)
+                    break;
+
+                else
+                    cardGrid[r][c] = new JPanel(new GridBagLayout());
                 backPanel.add(cardGrid[r][c]);
             }
         }
@@ -60,19 +74,22 @@ public class CardGrid extends JLayeredPane {
         int i = 0;
         int done = 0;
 
+        DrawStack d = (DrawStack)cardGrid[0][0];
+
         while(i < 52)
         {
 
             if(done == 0)
             for(int j = 0; j < COLUMNS; j++){
                 for(int k = 0; k != p; k++) {
-                    cardGrid[1][j].add(new CardTexture(i, s));
+                    CardTexture c = new CardTexture(i, s);
+                    cardGrid[1][j].add(c);
                     i++;
                 }
                 p++;
             }
             done = 1;
-            cardGrid[0][0].add(new CardTexture(i, s));
+            d.addCard(new CardTexture(i, s));
             i++;
         }
     }
@@ -92,21 +109,20 @@ public class CardGrid extends JLayeredPane {
         public void mousePressed(MouseEvent m) {
 
             clickedCardPanel = (JPanel)backPanel.getComponentAt(m.getPoint());
+
+
             Component[] c = clickedCardPanel.getComponents();
             if(c.length == 0 )
                 return;
+            if(c[0] instanceof CardTexture) {
 
-            if(c[0] instanceof CardTexture){
-                dragCard = (CardTexture)c[0];
-                System.out.println("Card:" + dragCard.toString());
-                clickedCardPanel.remove(dragCard);
-                clickedCardPanel.revalidate();
-                clickedCardPanel.repaint();
-
-                add(dragCard, JLayeredPane.DRAG_LAYER);
-                mouseDragged(m);
+               setDragCard(c);
+               add(dragCard, JLayeredPane.DRAG_LAYER);
+               dragCard.repaint();
+               mouseDragged(m);
             }
         }
+
 
 
         //Animation for moving card.
@@ -121,6 +137,7 @@ public class CardGrid extends JLayeredPane {
 
             //Repaint on drag to avoid card clipping
             repaint();
+            revalidate();
         }
         @Override
         public void mouseReleased(MouseEvent m){
@@ -159,8 +176,7 @@ public class CardGrid extends JLayeredPane {
                     }
                 //If invalid card panel, put back in original panel
                 if(invalidDrop(r, c)){
-                    clickedCardPanel.add(dragCard);
-                    clickedCardPanel.revalidate();
+                    putCardBack();
                 }
                 //else add to new destination
                 else{
@@ -177,9 +193,39 @@ public class CardGrid extends JLayeredPane {
         private void MoveCard(CardTexture c, int x, int y){
             c.setLocation(x, y);
             c.repaint();
+            dragCard.repaint();
         }
 
 
+        private void putCardBack(){
+            clickedCardPanel.add(dragCard);
+            clickedCardPanel.revalidate();
+        }
+
+        /**Figures out what card we're grabbing.
+         * Determines if we grab from a regular or DiscardStack
+         * @param c Components in JLabel object; must be CardTexture objects
+         */
+        private void setDragCard(Component[] c){
+            if (clickedCardPanel.toString().equals("DiscardStack")) {
+                dragCard = (CardTexture) c[c.length-1];
+
+                DiscardStack ds = (DiscardStack)clickedCardPanel;
+                clickedCardPanel.remove(dragCard);
+                ds.redraw();
+                System.out.println("I work, and I'm a " + dragCard.toString());
+
+            }
+
+            else {
+                dragCard = (CardTexture) c[0];
+                System.out.println("Card:" + dragCard.toString());
+                clickedCardPanel.remove(dragCard);
+                clickedCardPanel.revalidate();
+                clickedCardPanel.repaint();
+            }
+
+        }
 
 
         private boolean invalidDrop(int r, int c){
