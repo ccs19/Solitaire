@@ -1,6 +1,10 @@
+/**
+ * Created by christopher on 11/6/14.
+ */
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +18,7 @@ import java.io.Serializable;
 
 
 
-public class CardTexture extends JLabel implements Serializable{
+public class CardTest extends JPanel implements Serializable{
 
 
 
@@ -31,7 +35,7 @@ public class CardTexture extends JLabel implements Serializable{
             "jack_of_clubs.png","jack_of_diamonds.png","jack_of_spades.png","jack_of_hearts.png",
             "queen_of_clubs.png","queen_of_diamonds.png","queen_of_spades.png","queen_of_hearts.png",
             "king_of_clubs.png","king_of_diamonds.png","king_of_spades.png","king_of_hearts.png",
-            "ace_of_clubs.png","ace_of_diamonds.png","ace_of_spades.png","ace_of_hearts.png","card_back.png"};
+            "ace_of_clubs.png","ace_of_diamonds.png","ace_of_spades.png","ace_of_hearts.png"};
 
     private static int defaultCardXSize = 500;
     private static int defaultCardYSize = 726;
@@ -42,37 +46,40 @@ public class CardTexture extends JLabel implements Serializable{
     private static int cardXSize;
     private static int cardYSize;
     private static double cardDimensionModifier = .50;
+    private static BufferedImage img = null;
+    private static Image sizedImg = null;
 
+   // private static TestWindow gameWindow;
 
-    private BufferedImage imgUp = null;
-    private Image sizedImgUp = null;
-    private static BufferedImage imgDown = null;
-    private static Image sizedImgDown = null;
-
-
-
-    private static SolitaireWindow gameWindow;
-
-    private ImageIcon faceUp;
-    private static ImageIcon faceDown;
-
+    private static ImageIcon imgIcon;
     private String cardName;
 
 
-    CardTexture(int i, SolitaireWindow s){
-        gameWindow = s;
+    private int temp = 0;
+
+
+
+
+    public CardTest(int i, int num){
+        temp = num;
+
         resizeCard(i);
+        System.out.println("Adding "+ cardName);
     }
+
 
     private String getDir(int i){
         String pwd = System.getProperty("user.dir");
-        //System.out.println(pwd);
         cardName = cardNames[i];
         return pwd + "/src/textures/" + cardNames[i];
     }
 
     public String toString(){
         return cardName;
+    }
+
+    public void positionCard(int x, int y){
+        this.setLocation(x,y);
     }
 
 
@@ -86,16 +93,14 @@ public class CardTexture extends JLabel implements Serializable{
 
     private void resizeCard(int i){
         try{
-            imgDown = ImageIO.read(new File(getDir(52)));
-            imgUp = ImageIO.read(new File(getDir(i)));
+            img = ImageIO.read(new File(getDir(i)));
         }
         catch(IOException e){
             e.printStackTrace();
         }
 
-        //Create faceUp once
-        faceUp = new ImageIcon();
-        faceDown = new ImageIcon();
+        //Create imgIcon once
+        imgIcon = new ImageIcon();
         ResizeImageListener();
 
 
@@ -113,42 +118,28 @@ public class CardTexture extends JLabel implements Serializable{
 
     public void ResizeImageListener() {
 
-        cardXSize = (int)(cardDimensionModifier * (double) gameWindow.getXSize()/cardRatioX);
-        cardYSize = (int)(cardDimensionModifier * (double) gameWindow.getYSize() / cardRatioY);
+        cardXSize = 250;
+        cardYSize = 250;
 
 
 
-        sizedImgUp = imgUp.getScaledInstance(cardXSize, cardYSize, Image.SCALE_SMOOTH);
-        sizedImgDown = imgDown.getScaledInstance(cardXSize, cardYSize, Image.SCALE_SMOOTH);
-
-        faceUp.setImage(sizedImgUp);
-        faceDown.setImage(sizedImgDown);
-        setIcon(faceDown);
+        sizedImg = img.getScaledInstance(cardXSize, cardYSize, Image.SCALE_SMOOTH);
+        imgIcon.setImage(sizedImg);
         Dimension d = new Dimension();
-        d.setSize(cardXSize, cardYSize);
+        d.setSize(250,250);
         setPreferredSize(d);
     }
 
-    public void showCard(){
-        setIcon(faceUp);
-    }
-
-    public void hideCard(){
-        setIcon(faceDown);
-    }
-
-    @Override
-    public int getWidth(){
-        return cardXSize;
-    }
-
-    @Override
-    public int getHeight(){
-        return cardYSize;
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
+        imgIcon.paintIcon(this, g, 0, temp);
     }
 
 
-    public static Dimension getCardDimensions(){
-        return null;
-    }
+
+
+
 }
+
+
+

@@ -1,3 +1,6 @@
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * Created by christopher on 10/26/14.
  */
@@ -14,5 +17,6 @@ public class Tester {
         System.out.println("Making teh windoze");
         new SolitaireWindow();
 
-    }
+   }
 }
+

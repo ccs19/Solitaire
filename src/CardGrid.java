@@ -3,20 +3,21 @@ import java.awt.*;
 import java.awt.CardLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 
 /**
  * Created by christopher on 10/27/14.
  */
-public class CardGrid extends JLayeredPane {
+public class CardGrid extends JLayeredPane implements Serializable {
 
 
-    private static int WIDTH = 1280;
-    private static int HEIGHT = 1024;
+    private static int WIDTH = 1300;
+    private static int HEIGHT = 1000;
 
 
     private static final int ROWS = 2;
     private static final int COLUMNS = 7;
-    private static final int SPACE = 1;
+    private static final int SPACE = 10;
     private static final Dimension CARDGRIDSIZE = new Dimension(WIDTH,HEIGHT);
     private static final Dimension LABEL_SIZE = new Dimension(128,100);
     private GridLayout gridLayout = new GridLayout(ROWS, COLUMNS, SPACE, SPACE);
@@ -26,44 +27,50 @@ public class CardGrid extends JLayeredPane {
     private GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
 
+    //Need to create deck of cards?
+    private static int NUMSUITS = 4;
+
+
+
+
     public CardGrid(SolitaireWindow s) {
         backPanel.setSize(CARDGRIDSIZE);
         backPanel.setLocation(2 * SPACE, 2 * SPACE);
-        backPanel.setBackground(Color.WHITE);
-        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+        backPanel.setBackground(Color.GREEN);
+       // gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+       // gridBagConstraints.gridheight = 13;
 
 
 
+        //Create special card stacks
         cardGrid[0][1] = new DiscardStack();
-        cardGrid[0][0] = new DrawStack(this, (DiscardStack)cardGrid[0][1]);
-        backPanel.add(cardGrid[0][0]);
-        backPanel.add(cardGrid[0][1]);
+        cardGrid[0][2] = new DiscardStack();
+        cardGrid[0][0] = new DrawStack((DiscardStack)cardGrid[0][1]);
 
-        for(int r = 0; r < ROWS; r++){
-            for(int c = 0; c < COLUMNS; c++){
+        //Create finish stacks (Where we drop cards to win)
+        for(int i = 0; i < NUMSUITS; i++)
+            cardGrid[0][i+3] = new FinishStack();
 
-                //Don't add JPanel to special grids
-                if( r == 0 && c == 0 || r == 0 && c == 1)
-                    break;
+        //Create regular card stacks
+        for(int c = 0; c < COLUMNS; c++)
+            cardGrid[1][c] = new PlayStack();
 
-                else
-                    cardGrid[r][c] = new JPanel(new GridBagLayout());
-                backPanel.add(cardGrid[r][c]);
+        //Add all stacks to JPanel
+        for(int r = 0; r < ROWS; r++)
+            for(int c = 0; c < COLUMNS; c++) {
+                    backPanel.add(cardGrid[r][c]);
             }
-        }
 
-
-
+        //Fill stacks with cards
         addAllCards(s);
+
 
         backPanel.setBorder(BorderFactory.createEmptyBorder(SPACE, SPACE, SPACE, SPACE));
         setPreferredSize(CARDGRIDSIZE);
         add(backPanel, JLayeredPane.DEFAULT_LAYER);
-
         CardDrag mouseAdapter = new CardDrag();
         addMouseListener(mouseAdapter);
         addMouseMotionListener(mouseAdapter);
-
     }
 
 
@@ -78,14 +85,16 @@ public class CardGrid extends JLayeredPane {
 
         while(i < 52)
         {
-
+            PlayStack ps;
             if(done == 0)
             for(int j = 0; j < COLUMNS; j++){
+                ps = (PlayStack)cardGrid[1][j];
                 for(int k = 0; k != p; k++) {
                     CardTexture c = new CardTexture(i, s);
-                    cardGrid[1][j].add(c);
+                    ps.addCard( c );
                     i++;
                 }
+                ps.showTopCard();
                 p++;
             }
             done = 1;
@@ -96,26 +105,25 @@ public class CardGrid extends JLayeredPane {
 
 
     //Mouse drag class
-    private class CardDrag extends MouseAdapter {
+    private class CardDrag extends MouseAdapter implements Serializable{
 
         private CardTexture dragCard = null;
         private int wDiv;
         private int hDiv;
-        private JPanel clickedCardPanel = null;
+        private CardStack clickedCardPanel = null;
 
 
 
         @Override
         public void mousePressed(MouseEvent m) {
 
-            clickedCardPanel = (JPanel)backPanel.getComponentAt(m.getPoint());
+            clickedCardPanel = (CardStack)backPanel.getComponentAt(m.getPoint());
 
 
             Component[] c = clickedCardPanel.getComponents();
             if(c.length == 0 )
                 return;
             if(c[0] instanceof CardTexture) {
-
                setDragCard(c);
                add(dragCard, JLayeredPane.DRAG_LAYER);
                dragCard.repaint();
@@ -132,36 +140,35 @@ public class CardGrid extends JLayeredPane {
             wDiv = dragCard.getWidth() / 2;
             hDiv = dragCard.getHeight() / 2;
 
-
             MoveCard(dragCard, m.getPoint().x - wDiv, m.getPoint().y - hDiv);
 
             //Repaint on drag to avoid card clipping
             repaint();
-            revalidate();
         }
         @Override
         public void mouseReleased(MouseEvent m){
-
+            CardStack dropLocation;
             //If no valid click, do nothing, return
             if(dragCard == null) {
                 return;
             }
 
-            //Remove CardTexture from JPanel
+            //Remove CardTexture from JPanel layer
             remove(dragCard);
 
-            //Check valid drop location
-            JPanel dropLocation = (JPanel) backPanel.getComponentAt(m.getPoint());
-            if(dropLocation == null){
-                clickedCardPanel.add(dragCard);
-                clickedCardPanel.revalidate();
 
+            //If invalid drop location, put card back
+            try {
+                dropLocation = (CardStack) backPanel.getComponentAt(m.getPoint());
+            }
+            catch(Exception E){
+                putCardBack();
+                return;
             }
 
-            //Executes if valid drop location
-            else{
-                int r, c, x;
-                r = c = x = -1;
+
+            int r, c, x;
+            r = c = x = -1;
 
                 //Check each card grid location to see if we're putting it
                 //in a valid JPanel
@@ -175,15 +182,13 @@ public class CardGrid extends JLayeredPane {
                         }
                     }
                 //If invalid card panel, put back in original panel
-                if(invalidDrop(r, c)){
+                if(dropLocation.allowUserDrop() == false)
                     putCardBack();
-                }
                 //else add to new destination
-                else{
-                    dropLocation.add(dragCard);
-                    dropLocation.revalidate();
-                }
-            }
+                else
+                    dropLocation.addCard(dragCard);
+
+
         repaint();
         dragCard = null;
         }
@@ -198,47 +203,27 @@ public class CardGrid extends JLayeredPane {
 
 
         private void putCardBack(){
-            clickedCardPanel.add(dragCard);
-            clickedCardPanel.revalidate();
+            clickedCardPanel.addCard(dragCard);
         }
 
         /**Figures out what card we're grabbing.
-         * Determines if we grab from a regular or DiscardStack
+         * Determines if we grab from a regular or special stack
          * @param c Components in JLabel object; must be CardTexture objects
          */
         private void setDragCard(Component[] c){
-            if (clickedCardPanel.toString().equals("DiscardStack")) {
-                dragCard = (CardTexture) c[c.length-1];
-
-                DiscardStack ds = (DiscardStack)clickedCardPanel;
+            if (clickedCardPanel.toString().equals("DiscardStack") || clickedCardPanel.toString().equals("FinishStack")) {
+                dragCard = (CardTexture)c[c.length-1];
                 clickedCardPanel.remove(dragCard);
-                ds.redraw();
-                System.out.println("I work, and I'm a " + dragCard.toString());
-
             }
 
             else {
-                dragCard = (CardTexture) c[0];
+
+                PlayStack p = (PlayStack)clickedCardPanel;
+                dragCard = p.removeCard();
                 System.out.println("Card:" + dragCard.toString());
-                clickedCardPanel.remove(dragCard);
-                clickedCardPanel.revalidate();
-                clickedCardPanel.repaint();
             }
-
+        dragCard.setVisible(true);
         }
-
-
-        private boolean invalidDrop(int r, int c){
-            if(r == -1 || c == -1){
-                return true;
-            }
-            else if(r == 0 && c == 2 || r == 0 && c == 0 || r == 0 && c == 1)
-                return true;
-            else
-                return false;
-        }
-
-
     }
 
 }

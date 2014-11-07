@@ -2,50 +2,54 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 
 /**
  * Created by christopher on 10/28/14.
  */
-public class DrawStack extends DiscardStack {
+public class DrawStack extends CardStack implements Serializable{
 
 
     DiscardStack dStack = null;
 
-    public DrawStack(CardGrid cardGrid, DiscardStack discardStack){
+    public DrawStack(DiscardStack discardStack){
         super();
+        this.setLayout(new CardLayout());
         dStack = discardStack;
         this.addMouseListener(new clickStack());
     }
 
-    private void nextCard(){
-        dStack.addCard(this.removeCard());
-        repaint();
-        revalidate();
 
+    /**
+     * Draw next card and place on DiscardStack
+     */
+    private void nextCard(){
+        CardTexture c = this.removeCard();
+        c.showCard();
+        dStack.addCard(c);
     }
 
     @Override
     public void addCard(CardTexture c){
         this.add(c, getNumCards());
-        repaint();
-        revalidate();
     }
 
-    @Override
     public CardTexture removeCard(){
-        if(getNumCards() == 0)
-            return null;
-        CardTexture c = (CardTexture)this.getComponent(0);
-        repaint();
-        revalidate();
+        CardTexture c = this.removeCard(0);
         return c;
     }
 
+    public boolean allowUserDrop(){
+        return false;
+    }
+
+
+    public void onContainerChange(){}
 
 
 
 
-    private class clickStack extends MouseAdapter {
+    private class clickStack extends MouseAdapter implements Serializable {
         @Override
         public void mouseClicked(MouseEvent m){
             if(getNumCards() > 0) {
@@ -54,11 +58,11 @@ public class DrawStack extends DiscardStack {
             }
             else{
                 while(dStack.getNumCards() > 0){
-                    addCard(dStack.removeCard());
+                    CardTexture c = dStack.removeCard(0);
+                    c.hideCard();
+                    addCard(c);
                 }
             }
-
-
         }
 
     }

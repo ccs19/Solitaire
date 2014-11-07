@@ -2,11 +2,12 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 
 /**
  * Created by christopher on 10/26/14.
  */
-public class SolitaireWindow {
+public class SolitaireWindow implements Serializable{
 
 
     private static JFrame gameWindow;
@@ -17,6 +18,7 @@ public class SolitaireWindow {
     private static JCheckBoxMenuItem checkBoxMenuItem;
     private JMenuItem b;
     private static int[] monitorResolution = new int[2];
+    private CardGrid c;
 
 
 
@@ -28,52 +30,51 @@ public class SolitaireWindow {
 
     SolitaireWindow(){
         gameWindow = new JFrame("Ultimate Solitaire for Winners");
-        //Init window
 
-        gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //TODO: Add autosave on close
         createMenu();
 
-        //Create menu buttons
-        mainMenu.add(new JMenuItem("New"));
-        mainMenu.add(new JMenuItem("Save"));
-        mainMenu.add(new JMenuItem("Load"));
-        initExitButton();
+
 
         //Calculate window size
         findMonitorResolution();
         gameWindow.setSize((int) ((double) monitorResolution[0] * (0.9)), (int) ((double) monitorResolution[1] * (0.9)));
 
 
-        //Add card containers
-        initCardContainers();
 
 
-        CardGrid c = new CardGrid(this);
+        c = new CardGrid(this);
         gameWindow.getContentPane().add(c);
 
         gameWindow.setBackground(Color.GREEN);
 
-        redrawPage rp = new redrawPage();
-        gameWindow.addMouseListener(rp);
-        gameWindow.addMouseMotionListener(rp);
+        //redrawPage rp = new redrawPage();
+       // gameWindow.addMouseListener(rp);
+       // gameWindow.addMouseMotionListener(rp);
         gameWindow.setVisible(true);
 
 
 
     }
 
-    //Create menubar
+    /**
+     * Creates game menubar
+     */
     private void createMenu(){
         //Menubar on top of screen
         windowMenu = new JMenuBar();
         //Game JMenu
         mainMenu = new JMenu("Game");
-        mainMenu.setMnemonic(KeyEvent.VK_A);
-        mainMenu.getAccessibleContext().setAccessibleDescription("ItemsAdded");
         //Add items to menu
         windowMenu.add(mainMenu);
         //Add menu to JFrame
         gameWindow.setJMenuBar(windowMenu);
+
+        //Create and add menu buttons
+        initNewGameButton();
+        initSaveGameButton();
+        initLoadGameButton();
+        initExitButton();
     }
 
 
@@ -93,10 +94,6 @@ public class SolitaireWindow {
 
 
 
-
-    private void initCardContainers(){
-
-    }
 
 
 
@@ -128,13 +125,82 @@ public class SolitaireWindow {
 
 
 
-    private void initNewGameButton(){}
-    private void initSaveGameButton(){}
-    private void initLoadGameButton(){}
+    private void initNewGameButton(){
+        JMenuItem newGameButton = new JMenuItem("New");
+        //exitButton.addActionListener(new ActionListener(){
+            //public void actionPerformed(ActionEvent e){
+               // System.exit(0);
+           // }
+       // });
+        mainMenu.add(newGameButton);
+    }
 
 
+    private void initSaveGameButton(){
+        JMenuItem saveButton = new JMenuItem("Save");
+        saveButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                saveGame();
+            }
+        });
+        mainMenu.add(saveButton);
+    }
+    private void initLoadGameButton(){
+        JMenuItem loadButton = new JMenuItem("Load");
+        loadButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                loadGame();
+            }
+        });
+        mainMenu.add(loadButton);
+    }
 
-    private class redrawPage extends MouseAdapter{
+    private void saveGame(){
+        JFileChooser jFileChooser = new JFileChooser();
+        FileOutputStream f = null;
+
+        int r = jFileChooser.showSaveDialog(gameWindow);
+        if(r == JFileChooser.APPROVE_OPTION){
+            try{
+                f = new FileOutputStream(jFileChooser.getSelectedFile().getAbsolutePath());
+                ObjectOutputStream os = new ObjectOutputStream(f);
+                os.writeObject(c);
+                f.close();
+            }
+            catch (Exception e){
+                System.err.println("Error: " + e);
+            }
+
+        }
+    }
+
+
+    private void loadGame(){
+        JFileChooser jFileChooser = new JFileChooser();
+        FileInputStream f = null;
+        int r = jFileChooser.showOpenDialog(gameWindow);
+        if(r == JFileChooser.APPROVE_OPTION){
+            try{
+                f = new FileInputStream(jFileChooser.getSelectedFile().getAbsolutePath());
+                ObjectInputStream is = new ObjectInputStream(f);
+                gameWindow.remove(c);
+                c = (CardGrid)is.readObject();
+                f.close();
+                gameWindow.add(c);
+                SwingUtilities.updateComponentTreeUI(gameWindow);
+                gameWindow.getContentPane().revalidate();
+                gameWindow.getContentPane().repaint();
+            }
+            catch(Exception e){
+                System.err.println("Error reading file" + e.getMessage());
+
+            }
+        }
+
+    }
+
+
+    private class redrawPage extends MouseAdapter {
 
 
         @Override

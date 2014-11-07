@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.Serializable;
 import javax.swing.*;
 
 public class DragCardLayer extends JLayeredPane {
@@ -45,7 +46,7 @@ public class DragCardLayer extends JLayeredPane {
         addMouseMotionListener(myMouseAdapter);
     }
 
-    private class MyMouseAdapter extends MouseAdapter {
+    private class MyMouseAdapter extends MouseAdapter implements Serializable{
         private JLabel dragLabel = null;
         private int dragLabelWidthDiv2;
         private int dragLabelHeightDiv2;
