@@ -76,12 +76,6 @@ public class CardTexture extends JLabel implements Serializable{
     }
 
 
-    public static int defaultCardX(){
-        return defaultCardXSize;
-    }
-    public static int defaultCardY(){
-        return defaultCardYSize;
-    }
 
 
     private void resizeCard(int i){
@@ -113,8 +107,8 @@ public class CardTexture extends JLabel implements Serializable{
 
     public void ResizeImageListener() {
 
-        cardXSize = (int)(cardDimensionModifier * (double) gameWindow.getXSize()/cardRatioX);
-        cardYSize = (int)(cardDimensionModifier * (double) gameWindow.getYSize() / cardRatioY);
+        cardXSize = CardConstants.getNewCardSizeX();
+        cardYSize = CardConstants.getNewCardSizeY();
 
 
 

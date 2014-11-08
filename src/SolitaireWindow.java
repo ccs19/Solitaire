@@ -20,41 +20,24 @@ public class SolitaireWindow implements Serializable{
     private static int[] monitorResolution = new int[2];
     private CardGrid c;
 
-
-
-    private final GraphicsDevice g = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-
-
-    private int numCardContainers = 11;
-
-
     SolitaireWindow(){
         gameWindow = new JFrame("Ultimate Solitaire for Winners");
 
         gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //TODO: Add autosave on close
         createMenu();
 
-
-
         //Calculate window size
-        findMonitorResolution();
-        gameWindow.setSize((int) ((double) monitorResolution[0] * (0.9)), (int) ((double) monitorResolution[1] * (0.9)));
-
-
-
+        Dimension d = CardConstants.getScreenResolution();
+        gameWindow.setSize((int) ((double) d.getWidth() * (0.9)), (int) ((double) d.getHeight() * (0.9)));
 
         c = new CardGrid(this);
         gameWindow.getContentPane().add(c);
-
         gameWindow.setBackground(Color.GREEN);
 
         //redrawPage rp = new redrawPage();
        // gameWindow.addMouseListener(rp);
        // gameWindow.addMouseMotionListener(rp);
         gameWindow.setVisible(true);
-
-
-
     }
 
     /**
@@ -81,49 +64,15 @@ public class SolitaireWindow implements Serializable{
 
 
     //Create exit button in menu and add listener
-    private void initExitButton(){
+    private void initExitButton() {
         JMenuItem exitButton = new JMenuItem("Exit");
-        exitButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
+        exitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 System.exit(0);
             }
         });
         mainMenu.add(exitButton);
     }
-
-
-
-
-
-
-
-
-    private void findMonitorResolution(){
-        monitorResolution[0] = g.getDisplayMode().getWidth();
-        monitorResolution[1] = g.getDisplayMode().getHeight();
-        gameWindow.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent componentEvent) {
-                monitorResolution[0] = gameWindow.getWidth();
-                monitorResolution[1] = gameWindow.getHeight();
-                System.out.println("X: " + monitorResolution[0] + "  Y: " + monitorResolution[1]);
-            }
-        });
-    }
-
-
-
-    public int getXSize(){
-        return monitorResolution[0];
-    }
-
-    public int getYSize(){
-        return monitorResolution[1];
-    }
-
-
-
-
 
     private void initNewGameButton(){
         JMenuItem newGameButton = new JMenuItem("New");

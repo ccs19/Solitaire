@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -26,10 +27,11 @@ public class PlayStack extends CardStack implements Serializable{
     }
 
     public CardTexture removeCard(){
-        CardTexture c = this.removeCard(0);
-       // count -= 0.07f;
+        CardTexture c = removeCard(getCardClickedIndex());
         return c;
     }
+
+
 
     /*
      * If user is allowed to drop cards here, return true, else false
@@ -43,7 +45,7 @@ public class PlayStack extends CardStack implements Serializable{
 
 
     public void addCard(CardTexture c){
-        c.setBounds(0, 25*getNumCards(), c.getWidth(), c.getHeight());
+        c.setBounds(0, 25 * getNumCards(), c.getWidth(), c.getHeight());
         this.add(c);
         this.setComponentZOrder(c, 0);
     }

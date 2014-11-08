@@ -20,11 +20,11 @@ public class CardGrid extends JLayeredPane implements Serializable {
     private static final int SPACE = 10;
     private static final Dimension CARDGRIDSIZE = new Dimension(WIDTH,HEIGHT);
     private static final Dimension LABEL_SIZE = new Dimension(128,100);
-    private GridLayout gridLayout = new GridLayout(ROWS, COLUMNS, SPACE, SPACE);
-    private JPanel backPanel = new JPanel(gridLayout);
-    private JPanel[][] cardGrid = new JPanel[ROWS][COLUMNS];
-    private CardTexture c;
-    private GridBagConstraints gridBagConstraints = new GridBagConstraints();
+    private static GridLayout gridLayout = new GridLayout(ROWS, COLUMNS, SPACE, SPACE);
+    private static JPanel backPanel = new JPanel(gridLayout);
+    private static JPanel[][] cardGrid = new JPanel[ROWS][COLUMNS];
+
+    private CardGrid thisPane = this;
 
 
     //Need to create deck of cards?
@@ -74,8 +74,6 @@ public class CardGrid extends JLayeredPane implements Serializable {
     }
 
 
-
-
     private void addAllCards(SolitaireWindow s){
         int p = 1;
         int i = 0;
@@ -103,6 +101,10 @@ public class CardGrid extends JLayeredPane implements Serializable {
         }
     }
 
+    public JPanel getBackPanel(){
+        return backPanel;
+    }
+
 
     //Mouse drag class
     private class CardDrag extends MouseAdapter implements Serializable{
@@ -119,12 +121,12 @@ public class CardGrid extends JLayeredPane implements Serializable {
 
             clickedCardPanel = (CardStack)backPanel.getComponentAt(m.getPoint());
 
-
             Component[] c = clickedCardPanel.getComponents();
             if(c.length == 0 )
                 return;
             if(c[0] instanceof CardTexture) {
-               setDragCard(c);
+               clickedCardPanel.setValues(SwingUtilities.convertMouseEvent(thisPane, m, clickedCardPanel));
+               dragCard = clickedCardPanel.removeCard();
                add(dragCard, JLayeredPane.DRAG_LAYER);
                dragCard.repaint();
                mouseDragged(m);
@@ -210,18 +212,19 @@ public class CardGrid extends JLayeredPane implements Serializable {
          * Determines if we grab from a regular or special stack
          * @param c Components in JLabel object; must be CardTexture objects
          */
-        private void setDragCard(Component[] c){
-            if (clickedCardPanel.toString().equals("DiscardStack") || clickedCardPanel.toString().equals("FinishStack")) {
-                dragCard = (CardTexture)c[c.length-1];
-                clickedCardPanel.remove(dragCard);
-            }
+        private void setDragCard(Component[] c, MouseEvent m){
+            //if (clickedCardPanel.toString().equals("DiscardStack") || clickedCardPanel.toString().equals("FinishStack")) {
+            //    dragCard = (CardTexture)c[c.length-1];
+            //    clickedCardPanel.remove(dragCard);
+            //}
 
-            else {
+            //else {
 
-                PlayStack p = (PlayStack)clickedCardPanel;
-                dragCard = p.removeCard();
-                System.out.println("Card:" + dragCard.toString());
-            }
+              //  PlayStack p = (PlayStack)clickedCardPanel;
+             //   dragCard = p.removeCard();
+             //   System.out.println("Card:" + dragCard.toString());
+           // }
+
         dragCard.setVisible(true);
         }
     }

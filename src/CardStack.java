@@ -1,6 +1,9 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.Serializable;
 
 /**
@@ -8,10 +11,14 @@ import java.io.Serializable;
  */
 public abstract class CardStack extends JPanel implements Serializable{
 
+    private Component cardClicked= null;
+    private int cardClickedIndex = -1;
 
     CardStack(){
         super();
-
+        Dimension d = new Dimension();
+        d.setSize(CardConstants.getNewCardSizeX(), CardConstants.getNewCardSizeY());
+        this.setPreferredSize(d);
         this.addContainerListener(new ContainerListener() {
             @Override
             public void componentAdded(ContainerEvent containerEvent) {
@@ -23,6 +30,7 @@ public abstract class CardStack extends JPanel implements Serializable{
                 redraw();
             }
         });
+        //this.addMouseListener(new CardClicked());
 
     }
 
@@ -39,8 +47,8 @@ public abstract class CardStack extends JPanel implements Serializable{
     public abstract void onContainerChange();
 
     /*
-     * If user is allowed to drop cards here, return true, else false
-     * This does not indicate whether the card added is valid
+     * If user is allowed to drop cards here return true, else false
+     * This does not indicate whether the card added is valid according to game rules
      */
     public abstract boolean allowUserDrop();
 
@@ -66,6 +74,9 @@ public abstract class CardStack extends JPanel implements Serializable{
      */
     public abstract CardTexture removeCard();
 
+    public CardTexture[] getMoveStack(){
+        return new CardTexture[13];
+    }
 
     /**
      * Removes and returns card by index
@@ -83,5 +94,51 @@ public abstract class CardStack extends JPanel implements Serializable{
             return null;
     }
 
+
+
+    public CardTexture getCardClicked(){
+        return (CardTexture)cardClicked;
+    }
+
+    public int getCardClickedIndex(){
+        return cardClickedIndex;
+    }
+
+    public void setCardClickedIndex(int s){
+        cardClickedIndex = s;
+    }
+
+    public void setCardClicked(Component s){
+        cardClicked = s;
+    }
+
+    public void setValues(MouseEvent m){
+        //NOTE: POSSIBLE BUGS.
+        //Keep an eye out for null pointer exceptions.
+        //NOTE AGAIN:  There ARE exceptions. Possible data loss.
+        //TODO: ADD TRY/CATCH
+       // Point p = m.getPoint();
+
+        //SwingUtilities.convertPointFromScreen(p, this);
+        cardClicked = getComponentAt(m.getPoint());
+
+        Container c = cardClicked.getParent();
+
+        int j = getNumCards();
+        for(int i = 0; i < j; i++){
+            if(c.getComponent(i) == cardClicked)
+                cardClickedIndex = i;
+        }
+        System.out.println("This: " + cardClicked.toString() + " and this " + cardClickedIndex);
+    }
+
+    private class CardClicked extends MouseAdapter implements Serializable{
+
+        @Override
+        public void mousePressed(MouseEvent m){
+
+        }
+
+    }
 
 }
