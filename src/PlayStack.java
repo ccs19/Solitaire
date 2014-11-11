@@ -50,6 +50,12 @@ public class PlayStack extends CardStack implements Serializable{
         this.setComponentZOrder(c, 0);
     }
 
+    @Override
+    public void addCard(CardTexture c, int n){
+        c.setBounds(0, this.getCardClickedY(), c.getWidth(), c.getHeight());
+        this.add(c, getCardClickedIndex());
+    }
+
     /*
      * Shows playable cards
      */

@@ -13,6 +13,9 @@ public abstract class CardStack extends JPanel implements Serializable{
 
     private Component cardClicked= null;
     private int cardClickedIndex = -1;
+    private int cardClickedY = 0;
+
+    private Dimension cardClickedLocation = new Dimension();
 
     CardStack(){
         super();
@@ -61,11 +64,27 @@ public abstract class CardStack extends JPanel implements Serializable{
     }
 
     /**
-     * Add a card to the stack
+     * Add a card to top of stack (Index 0)
      * @param c card to add to stack
      */
     public void addCard(CardTexture c){
+
         this.add(c);
+        redraw();
+        c.setVisible(true);
+    }
+
+    public void resetValues(){
+
+    }
+
+    /**
+     * Add card to specified index
+     */
+    public void addCard(CardTexture c, int n){
+        this.add(c,n);
+        System.out.println("Adding card to index " + n);
+        redraw();
     }
 
     /**
@@ -112,6 +131,12 @@ public abstract class CardStack extends JPanel implements Serializable{
         cardClicked = s;
     }
 
+    public int getCardClickedY(){
+        return cardClickedY;
+    }
+
+
+
     public void setValues(MouseEvent m){
         //NOTE: POSSIBLE BUGS.
         //Keep an eye out for null pointer exceptions.
@@ -129,7 +154,10 @@ public abstract class CardStack extends JPanel implements Serializable{
             if(c.getComponent(i) == cardClicked)
                 cardClickedIndex = i;
         }
+        cardClickedY = cardClicked.getY();
         System.out.println("This: " + cardClicked.toString() + " and this " + cardClickedIndex);
+        cardClicked.setVisible(true);
+
     }
 
     private class CardClicked extends MouseAdapter implements Serializable{

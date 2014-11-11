@@ -119,18 +119,24 @@ public class CardGrid extends JLayeredPane implements Serializable {
         @Override
         public void mousePressed(MouseEvent m) {
 
-            clickedCardPanel = (CardStack)backPanel.getComponentAt(m.getPoint());
+            try {
+                clickedCardPanel = (CardStack) backPanel.getComponentAt(m.getPoint());
+            }
+            catch(Exception E){
+                return;
+            }
 
             Component[] c = clickedCardPanel.getComponents();
             if(c.length == 0 )
                 return;
-            if(c[0] instanceof CardTexture) {
+            else if(clickedCardPanel instanceof CardStack) {
                clickedCardPanel.setValues(SwingUtilities.convertMouseEvent(thisPane, m, clickedCardPanel));
                dragCard = clickedCardPanel.removeCard();
                add(dragCard, JLayeredPane.DRAG_LAYER);
                dragCard.repaint();
                mouseDragged(m);
             }
+
         }
 
 
@@ -138,14 +144,19 @@ public class CardGrid extends JLayeredPane implements Serializable {
         //Animation for moving card.
         @Override
         public void mouseDragged(MouseEvent m){
-            //Click offset so mouse pointer is in middle of card
-            wDiv = dragCard.getWidth() / 2;
-            hDiv = dragCard.getHeight() / 2;
+            try {
+                //Click offset so mouse pointer is in middle of card
+                wDiv = dragCard.getWidth() / 2;
+                hDiv = dragCard.getHeight() / 2;
 
-            MoveCard(dragCard, m.getPoint().x - wDiv, m.getPoint().y - hDiv);
+                MoveCard(dragCard, m.getPoint().x - wDiv, m.getPoint().y - hDiv);
 
-            //Repaint on drag to avoid card clipping
-            repaint();
+                //Repaint on drag to avoid card clipping
+                repaint();
+            }
+            catch(Exception e){
+                return;
+            }
         }
         @Override
         public void mouseReleased(MouseEvent m){
@@ -187,8 +198,12 @@ public class CardGrid extends JLayeredPane implements Serializable {
                 if(dropLocation.allowUserDrop() == false)
                     putCardBack();
                 //else add to new destination
-                else
+                else if(dropLocation == clickedCardPanel)
+                    putCardBack();
+                else {
                     dropLocation.addCard(dragCard);
+                    clickedCardPanel.repaint();
+                }
 
 
         repaint();
@@ -205,7 +220,7 @@ public class CardGrid extends JLayeredPane implements Serializable {
 
 
         private void putCardBack(){
-            clickedCardPanel.addCard(dragCard);
+            clickedCardPanel.addCard(dragCard, clickedCardPanel.getCardClickedIndex());
         }
 
         /**Figures out what card we're grabbing.
@@ -225,7 +240,7 @@ public class CardGrid extends JLayeredPane implements Serializable {
              //   System.out.println("Card:" + dragCard.toString());
            // }
 
-        dragCard.setVisible(true);
+
         }
     }
 
