@@ -5,7 +5,7 @@ import java.awt.event.*;
 import java.io.*;
 
 /**
- * Created by christopher on 10/26/14.
+ * Created by Christopher Schneider on 10/26/14.
  */
 public class SolitaireWindow implements Serializable{
 
@@ -13,15 +13,13 @@ public class SolitaireWindow implements Serializable{
     private static JFrame gameWindow;
     private static JMenuBar windowMenu;
     private static JMenu mainMenu, save;
-    private static JMenuItem menuItem;
-    private static JRadioButtonMenuItem buttonMenuItem;
-    private static JCheckBoxMenuItem checkBoxMenuItem;
-    private JMenuItem b;
-    private static int[] monitorResolution = new int[2];
     private CardGrid c;
 
+    /**
+     * Creates solitaire game window
+     */
     SolitaireWindow(){
-        gameWindow = new JFrame("Ultimate Solitaire for Winners");
+        gameWindow = new JFrame("Solitaire");
 
         gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //TODO: Add autosave on close
         createMenu();
@@ -29,15 +27,8 @@ public class SolitaireWindow implements Serializable{
         //Calculate window size
         Dimension d = CardConstants.getScreenResolution();
         gameWindow.setSize((int) ((double) d.getWidth() * (0.9)), (int) ((double) d.getHeight() * (0.9)));
+        initGameWindow();
 
-        c = new CardGrid(this);
-        gameWindow.getContentPane().add(c);
-        gameWindow.setBackground(Color.GREEN);
-
-        //redrawPage rp = new redrawPage();
-       // gameWindow.addMouseListener(rp);
-       // gameWindow.addMouseMotionListener(rp);
-        gameWindow.setVisible(true);
     }
 
     /**
@@ -60,10 +51,20 @@ public class SolitaireWindow implements Serializable{
         initExitButton();
     }
 
+    /**
+     * Initialize game window
+     */
+    private void initGameWindow(){
+        c = new CardGrid(this);
+        gameWindow.getContentPane().add(c);
+        gameWindow.setBackground(Color.GREEN);
+        gameWindow.setVisible(true);
+    }
 
 
-
-    //Create exit button in menu and add listener
+    /**
+     * Create exit button
+     */
     private void initExitButton() {
         JMenuItem exitButton = new JMenuItem("Exit");
         exitButton.addActionListener(new ActionListener() {
@@ -74,17 +75,25 @@ public class SolitaireWindow implements Serializable{
         mainMenu.add(exitButton);
     }
 
+    /**
+     * Create new game button
+     */
     private void initNewGameButton(){
         JMenuItem newGameButton = new JMenuItem("New");
-        //exitButton.addActionListener(new ActionListener(){
-            //public void actionPerformed(ActionEvent e){
-               // System.exit(0);
-           // }
-       // });
+        newGameButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                gameWindow.getContentPane().remove(c);
+                c.resetGame();
+                c = null;
+                initGameWindow();
+            }
+        });
         mainMenu.add(newGameButton);
     }
 
-
+    /**
+     * Create save game button
+     */
     private void initSaveGameButton(){
         JMenuItem saveButton = new JMenuItem("Save");
         saveButton.addActionListener(new ActionListener(){
@@ -94,6 +103,10 @@ public class SolitaireWindow implements Serializable{
         });
         mainMenu.add(saveButton);
     }
+
+    /**
+     * Create load game button
+     */
     private void initLoadGameButton(){
         JMenuItem loadButton = new JMenuItem("Load");
         loadButton.addActionListener(new ActionListener(){
@@ -104,6 +117,9 @@ public class SolitaireWindow implements Serializable{
         mainMenu.add(loadButton);
     }
 
+    /**
+     * Open save dialog
+     */
     private void saveGame(){
         JFileChooser jFileChooser = new JFileChooser();
         FileOutputStream f = null;
@@ -123,7 +139,9 @@ public class SolitaireWindow implements Serializable{
         }
     }
 
-
+    /**
+     * Opens JFileChooser for loading game.
+     */
     private void loadGame(){
         JFileChooser jFileChooser = new JFileChooser();
         FileInputStream f = null;

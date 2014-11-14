@@ -12,6 +12,10 @@ public class DrawStack extends CardStack implements Serializable{
 
     DiscardStack dStack = null;
 
+    /**
+     * Stack of cards to draw from
+     * @param discardStack Where to deposit cards drawn
+     */
     public DrawStack(DiscardStack discardStack){
         super();
         this.setLayout(new CardLayout());
@@ -19,6 +23,10 @@ public class DrawStack extends CardStack implements Serializable{
         this.addMouseListener(new clickStack());
     }
 
+    /**
+     * Unused
+     * @return null
+     */
     @Override
     public MoveStack getMoveStack() {
         return null;
@@ -33,6 +41,10 @@ public class DrawStack extends CardStack implements Serializable{
         dStack.addCard(c);
     }
 
+    /**
+     * Add card
+     * @param c card to add to stack
+     */
     @Override
     public void addCard(CardTexture c){
         this.add(c, getNumCards());
@@ -51,15 +63,14 @@ public class DrawStack extends CardStack implements Serializable{
     public void onContainerChange(){}
 
 
-
-
+    /**
+     * When clicked, add card to discardStack
+     */
     private class clickStack extends MouseAdapter implements Serializable {
         @Override
         public void mouseClicked(MouseEvent m){
-            if(getNumCards() > 0) {
+            if(getNumCards() > 0)
                 nextCard();
-                System.out.println("num cards: " + getNumCards());
-            }
             else{
                 while(dStack.getNumCards() > 0){
                     CardTexture c = dStack.removeCard(0);

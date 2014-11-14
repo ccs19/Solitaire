@@ -5,72 +5,80 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- * Created by christopher on 11/5/14.
+ * Created by Christopher Schneider on 11/5/14.
  */
 public class PlayStack extends CardStack implements Serializable{
 
+    /**
+     * Initializes cascaded play stacks
+     */
     public PlayStack(){
         super();
         setLayout(null);
     }
 
+    /**
+     * Returns card stack type name
+     * @return string "PlayStack"
+     */
     public String toString(){
         return "PlayStack";
     }
 
+    /**
+     * Unused in this class
+     */
     public void onContainerChange(){
     }
 
+    /**
+     * Remove card based on index
+     * @return Card clicked
+     */
     public CardTexture removeCard(){
         CardTexture c = removeCard(getCardClickedIndex());
         return c;
     }
 
-    /*
-     * If user is allowed to drop cards here, return true, else false
-     * This does not indicate whether the card addition is valid.
-     */
 
     public boolean allowUserDrop(){
         return true;
     }
 
 
-
+    /**
+     * Add card and place it according to number of cards in stack.
+     * @param c card to add to stack
+     */
     public void addCard(CardTexture c){
         c.setBounds(0, 25 * getNumCards(), c.getWidth(), c.getHeight());
         this.add(c);
         this.setComponentZOrder(c, 0);
     }
 
+    /**
+     * Add card and cascade it
+     * @param c Card to be added
+     * @param n Index to add to
+     */
     @Override
     public void addCard(CardTexture c, int n){
         c.setBounds(0, this.getCardClickedY(), c.getWidth(), c.getHeight());
         this.add(c, getCardClickedIndex());
     }
 
-    /*
-     * Shows playable cards
-     */
-    public void showTopCard(){
-        if(this.getComponentCount() == 0)
-            return;
-        Component[] c = this.getComponents();
-        CardTexture card = (CardTexture)c[0];
-        card.showCard();
-    }
 
+    /**
+     * Return movestack based on card clicked
+     * @return stack clicked
+     */
     @Override
     public MoveStack getMoveStack() {
-        System.out.println("Adding PlayStack");
         MoveStack moveStack = new MoveStack();
         int size = this.getCardClickedIndex();
         for(int i = 0; i < size+1; i++) {
-            System.out.println("Size " + size);
             moveStack.addCard(this.removeCard(size-i));
-            System.out.println("Removing index " + (size) );
         }
-        this.repaint();
         return moveStack;
     }
 }

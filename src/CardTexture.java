@@ -5,9 +5,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
 
 /**
- * Created by christopher on 10/26/14.
+ * Created by Christopher Schneider on 10/26/14.
  */
 
 
@@ -17,8 +18,8 @@ import java.io.Serializable;
 public class CardTexture extends JLabel implements Serializable{
 
 
-
-    private static String[] cardNames = {
+    //Card file names
+    private static final String[] cardNames = {
             "2_of_clubs.png","2_of_diamonds.png","2_of_spades.png","2_of_hearts.png",
             "3_of_clubs.png","3_of_diamonds.png","3_of_spades.png","3_of_hearts.png",
             "4_of_clubs.png","4_of_diamonds.png","4_of_spades.png","4_of_hearts.png",
@@ -33,55 +34,79 @@ public class CardTexture extends JLabel implements Serializable{
             "king_of_clubs.png","king_of_diamonds.png","king_of_spades.png","king_of_hearts.png",
             "ace_of_clubs.png","ace_of_diamonds.png","ace_of_spades.png","ace_of_hearts.png","card_back.png"};
 
-    private static int defaultCardXSize = 500;
-    private static int defaultCardYSize = 726;
-    private static double cardRatioX = 5;
-    private static double cardRatioY = 3;
-    //Ratio 3.84x, 1.65y
 
     private static int cardXSize;
     private static int cardYSize;
-    private static double cardDimensionModifier = .50;
 
-
-    private BufferedImage imgUp = null;
-    private Image sizedImgUp = null;
-    private static BufferedImage imgDown = null;
-    private static Image sizedImgDown = null;
-
-
-
-    private static SolitaireWindow gameWindow;
+    private transient BufferedImage imgUp = null;
+    private transient Image sizedImgUp = null;
+    private transient static BufferedImage imgDown = null;
+    private transient static Image sizedImgDown = null;
 
     private ImageIcon faceUp;
     private static ImageIcon faceDown;
-
     private String cardName;
 
+    private Card card = null;
 
-    CardTexture(int i, SolitaireWindow s){
-        gameWindow = s;
+    /**
+     * Class to visibly show cards
+     * @param i Value of card from 0-51
+     */
+    CardTexture(int i){
         resizeCard(i);
+        setCard(i);
     }
 
-    private String getDir(int i){
-        String pwd = System.getProperty("user.dir");
-        //System.out.println(pwd);
-        cardName = cardNames[i];
-        return pwd + "/src/textures/" + cardNames[i];
+    /**
+     * Creates an instance of card class
+     * @param i Value of card from 0-51
+     */
+    private void setCard(int i){
+        card = new Card(i);
     }
 
+    /**
+     * Return suit of card
+     * @return suit of card
+     */
+    public String getSuit(){
+        return card.getSuit();
+    }
+
+    /**
+     * Return numerical value of card from 1-13
+     * @return value of card
+     */
+    public int getVal(){
+        return card.getNumber();
+    }
+
+    /**
+     * Return color of card
+     * @return color of card
+     */
+    public String getColor(){
+        return card.getColor();
+    }
+
+
+    /**
+     * Return name of card. e.g. 2,3, ... , King, Ace
+     * @return name of card
+     */
     public String toString(){
         return cardName;
     }
 
-
-
-
+    /**
+     * Open card and create icons
+     * @param i Value of card from 0-51
+     */
     private void resizeCard(int i){
         try{
-            imgDown = ImageIO.read(new File(getDir(52)));
-            imgUp = ImageIO.read(new File(getDir(i)));
+            imgDown = ImageIO.read(getClass().getResourceAsStream("textures/" + cardNames[52]));
+            imgUp = ImageIO.read(getClass().getResourceAsStream("textures/" + cardNames[i]));
         }
         catch(IOException e){
             e.printStackTrace();
@@ -91,20 +116,11 @@ public class CardTexture extends JLabel implements Serializable{
         faceUp = new ImageIcon();
         faceDown = new ImageIcon();
         ResizeImageListener();
-
-
-        //Re-add later
-        /*this.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                ResizeImageListener();
-            }
-        });*/
-
-
     }
 
-
+    /**
+     *   Sizes the card initially
+     */
     public void ResizeImageListener() {
         cardXSize = CardConstants.getNewCardSizeX();
         cardYSize = CardConstants.getNewCardSizeY();
@@ -120,26 +136,36 @@ public class CardTexture extends JLabel implements Serializable{
         setPreferredSize(d);
     }
 
+    /**
+     * Shows the card's face value
+     */
     public void showCard(){
         setIcon(faceUp);
     }
 
+
+    /**
+     * Shows the card face down.
+     */
     public void hideCard(){
         setIcon(faceDown);
     }
 
+    /**
+     * Returns the card's X value in pixels
+     * @return Card X size
+     */
     @Override
     public int getWidth(){
         return cardXSize;
     }
 
+    /**
+     * Returns the card's Y value in pixels
+     * @return Card Y size
+     */
     @Override
     public int getHeight(){
         return cardYSize;
-    }
-
-
-    public static Dimension getCardDimensions(){
-        return null;
     }
 }

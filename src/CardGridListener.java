@@ -10,8 +10,6 @@ import java.io.Serializable;
 public class CardGridListener extends MouseAdapter implements Serializable {
 
     private CardTexture dragCard = null;
-    private int wDiv = 0;
-    private int hDiv = 0;
     private CardStack clickedCardPanel = null;
 
     private CardGrid cardGrid = null;
@@ -21,72 +19,50 @@ public class CardGridListener extends MouseAdapter implements Serializable {
     private int dx = 0;
     private int dy = 0;
 
-
+    /**
+     * Initializes card listener with game rules
+     * @param cg Main game grid
+     */
     public CardGridListener(CardGrid cg){
         cardGrid = cg;
         backPanel = cardGrid.getBackPanel();
     }
 
+    /**
+     * Listener for mouse press
+     * @param m Mouse event
+     */
     @Override
     public void mousePressed(MouseEvent m) {
-
-
         setStackClicked(m);
         MoveStack(dragStack, m.getLocationOnScreen());
         cardGrid.repaint();
         //System.out.println("X: " + dragStack.getY() + " Y: " + dragStack.getX());
-
-
-//        try {
-//            clickedCardPanel = (CardStack) backPanel.getComponentAt(m.getPoint());
-//        }
-//        catch(Exception E){
-//            return;
-//        }
-//
-//        Component[] c = clickedCardPanel.getComponents();
-//        if(c.length == 0 )
-//            return;
-//        else if(clickedCardPanel instanceof CardStack) {
-//            clickedCardPanel.setValues(SwingUtilities.convertMouseEvent(cardGrid, m, clickedCardPanel));
-//            dragCard = clickedCardPanel.removeCard();
-//            cardGrid.add(dragCard, JLayeredPane.DRAG_LAYER);
-//            dragCard.repaint();
-//            mouseDragged(m);
-//        }
-
     }
 
-
-
-    //Animation for moving card.
+    /**
+     * Listener for mouse drag
+     * @param m Mouse event
+     */
     @Override
     public void mouseDragged(MouseEvent m){
         try {
-            //Click offset so mouse pointer is in middle of card
-            //wDiv = dragCard.getWidth() / 2;
-            //hDiv = dragCard.getHeight() / 2;
-
             MoveStack(dragStack, m.getPoint());
-            System.out.println("X: " + dragStack.getY() + " Y: " + dragStack.getX());
-            //Repaint on drag to avoid card clipping
-
-            int x = dragStack.getNumCards();
-            //debug
-
-
-
-            dragStack.printCards();
         }
         catch(Exception e){
             return;
         }
     }
 
-
+    /**
+     * Listener for mouse release.
+     * Verifies the card is placed in the right spot
+     * @param m Mouse event
+     */
     @Override
     public void mouseReleased(MouseEvent m){
         CardStack dropLocation;
+        boolean valid = true;
         //If no valid click, do nothing, return
         if(dragStack == null) {
             return;
@@ -96,26 +72,34 @@ public class CardGridListener extends MouseAdapter implements Serializable {
         //If invalid card panel, put back in original panel
         try {
             dropLocation = (CardStack) backPanel.getComponentAt(m.getPoint());
-            if (dropLocation.allowUserDrop() == false)
+            if (dropLocation.allowUserDrop() == false || dropLocation == clickedCardPanel)
                 putStackBack();
-                //else add to new destination
-            else if (dropLocation == clickedCardPanel)
-                putStackBack();
+            else if(dropLocation.toString().equals("FinishStack")){
+                FinishStack f = (FinishStack)dropLocation;
+                valid = f.addCardStackFinish(dragStack);
+            }
             else {
                 dropLocation.addCardStack(dragStack);
-                clickedCardPanel.repaint();
             }
         }
         catch(Exception e){
             putStackBack();
             return;
         }
+
+        if(!valid)
+            putStackBack();
+        clickedCardPanel.showTopCard();
+        clickedCardPanel.repaint();
         cardGrid.revalidate();
         cardGrid.repaint();
         dragStack = null;
     }
 
-
+    /**
+     * Get the stack we've clicked
+     * @param m Mouse event
+     */
     private void setStackClicked(MouseEvent m){
 
         try {
@@ -124,17 +108,12 @@ public class CardGridListener extends MouseAdapter implements Serializable {
         catch(Exception E){
             return;
         }
-
-
-
         Component[] c = clickedCardPanel.getComponents();
         if(c.length == 0 )
             return;
         else if(clickedCardPanel instanceof CardStack) {
             clickedCardPanel.setValues(SwingUtilities.convertMouseEvent(cardGrid, m, clickedCardPanel));
             dragStack = clickedCardPanel.getMoveStack();
-            dx = m.getLocationOnScreen().x - dragStack.getX();
-            dy = m.getLocationOnScreen().y - dragStack.getY();
             dragStack.setLocation(m.getLocationOnScreen().x - dx, m.getLocationOnScreen().y - dy);
             cardGrid.add(dragStack);
             cardGrid.setComponentZOrder(dragStack,0);
@@ -143,37 +122,45 @@ public class CardGridListener extends MouseAdapter implements Serializable {
         }
     }
 
-
-    //Allows fluid movement of one card
+    /**
+     * Allows fluid movement of one card
+     * @param c Card moved
+     * @param x Card x location
+     * @param y Card y location
+     */
     private void MoveCard(CardTexture c, int x, int y){
-
-
-
         c.setLocation(x, y);
         c.repaint();
         dragCard.repaint();
     }
 
-
-
+    /**
+     * Supposed to allow fluid movement of stack of cards
+     * @param ms Stack moved
+     * @param point Mouse location
+     */
     private void MoveStack(MoveStack ms, Point point){
-        //cardGrid.moveToFront(m);
-
-        //debug
-        //System.out.println("")
-
-
         ms.setLocation(point);
         ms.repaint();
     }
 
-
+    /**
+     * Puts a card back to its original stack.
+     */
     private void putCardBack(){
         clickedCardPanel.addCard(dragCard, clickedCardPanel.getCardClickedIndex());
     }
 
+    /**
+     * Puts a stack back in its original location
+     */
     private void putStackBack(){
-        clickedCardPanel.addCardStack(dragStack);
+        if(clickedCardPanel.toString().equals("FinishStack")){
+            FinishStack f = (FinishStack)clickedCardPanel;
+            f.addCardStackFinish(dragStack);
+        }
+        else
+            clickedCardPanel.addCardStack(dragStack);
     }
 
 

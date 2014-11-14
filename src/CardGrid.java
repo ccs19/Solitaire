@@ -19,21 +19,19 @@ public class CardGrid extends JLayeredPane implements Serializable {
     private static final int COLUMNS = 7;
     private static final int SPACE = 10;
     private static final Dimension CARDGRIDSIZE = new Dimension(WIDTH,HEIGHT);
-    private static final Dimension LABEL_SIZE = new Dimension(128,100);
     private static GridLayout gridLayout = new GridLayout(ROWS, COLUMNS, SPACE, SPACE);
-    private static JPanel backPanel = new JPanel(gridLayout);
+    private static JPanel backPanel = null;
     private static JPanel[][] cardGrid = new JPanel[ROWS][COLUMNS];
 
-    private CardGrid thisPane = this;
-
-
-    //Need to create deck of cards?
     private static int NUMSUITS = 4;
 
 
-
-
+    /**
+     * Creates the game board with all card stacks
+     * @param s Reference to game window
+     */
     public CardGrid(SolitaireWindow s) {
+        backPanel = new JPanel(gridLayout);
         backPanel.setSize(CARDGRIDSIZE);
         backPanel.setLocation(2 * SPACE, 2 * SPACE);
         backPanel.setBackground(Color.GREEN);
@@ -43,6 +41,7 @@ public class CardGrid extends JLayeredPane implements Serializable {
         //Create special card stacks
         cardGrid[0][1] = new DiscardStack();
         cardGrid[0][2] = new DiscardStack();
+        cardGrid[0][2].setBackground(Color.green);
         cardGrid[0][0] = new DrawStack((DiscardStack)cardGrid[0][1]);
 
         //Create finish stacks (Where we drop cards to win)
@@ -60,9 +59,7 @@ public class CardGrid extends JLayeredPane implements Serializable {
             }
 
         //Fill stacks with cards
-        addAllCards(s);
-
-
+        addAllCards();
         backPanel.setBorder(BorderFactory.createEmptyBorder(SPACE, SPACE, SPACE, SPACE));
         setPreferredSize(CARDGRIDSIZE);
         add(backPanel, JLayeredPane.DEFAULT_LAYER);
@@ -71,14 +68,17 @@ public class CardGrid extends JLayeredPane implements Serializable {
         addMouseMotionListener(mouseAdapter);
     }
 
-
-    private void addAllCards(SolitaireWindow s){
+    /**
+     * Create a new deck and add all cards in the proper format
+     *
+     */
+    private void addAllCards(){
         int p = 1;
         int i = 0;
         int done = 0;
 
         DrawStack d = (DrawStack)cardGrid[0][0];
-
+        Deck deck = new Deck();
         while(i < 52)
         {
             PlayStack ps;
@@ -86,21 +86,32 @@ public class CardGrid extends JLayeredPane implements Serializable {
             for(int j = 0; j < COLUMNS; j++){
                 ps = (PlayStack)cardGrid[1][j];
                 for(int k = 0; k != p; k++) {
-                    CardTexture c = new CardTexture(i, s);
-                    ps.addCard( c );
+                    ps.addCard( deck.drawCard() );
                     i++;
                 }
                 ps.showTopCard();
                 p++;
             }
             done = 1;
-            d.addCard(new CardTexture(i, s));
+            d.addCard( deck.drawCard() );
             i++;
         }
     }
 
+    /**
+     * Get the back panel which holds the card stacks
+     * @return Game back panel
+     */
     public JPanel getBackPanel(){
         return backPanel;
+    }
+
+    /**
+     * Remove the back panel and dereference it.
+     */
+    public void resetGame(){
+        this.remove(backPanel);
+        backPanel = null;
     }
 
 

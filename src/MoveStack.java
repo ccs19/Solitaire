@@ -1,18 +1,19 @@
 import java.awt.*;
+import java.io.Serializable;
 
 /**
- * Created by christopher on 11/13/14.
+ * Created by Christopher Schneider on 11/13/14.
  */
-public class MoveStack extends CardStack{
+public class MoveStack extends CardStack implements Serializable {
 
+    /**
+     * Movable card stack
+     */
     public MoveStack() {
         super();
-        //this.setOpaque(true);
         this.setLayout(null);
         this.revalidate();
         this.repaint();
-        this.setVisible(true);
-
     }
 
     public boolean allowUserDrop(){
@@ -22,6 +23,7 @@ public class MoveStack extends CardStack{
     public MoveStack getMoveStack(){
         return this;
     }
+
 
     @Override
     public void addCard(CardTexture c){
@@ -43,16 +45,5 @@ public class MoveStack extends CardStack{
 
     //UNUSED
     public void onContainerChange(){}
-
-    public void printCards(){
-        int x = this.getNumCards();
-
-        //debug
-        for(int i = 0; i < x; i++){
-          //  System.out.println("Cardx: " + this.getComponent(i).getX() + "Cardy: " + this.getComponent(i).getY());
-
-        }
-    }
-
 
 }

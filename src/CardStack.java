@@ -15,8 +15,6 @@ public abstract class CardStack extends JPanel implements Serializable{
     private int cardClickedIndex = -1;
     private int cardClickedY = 0;
 
-    private Dimension cardClickedLocation = new Dimension();
-
     CardStack(){
         super();
         this.setBackground(Color.BLACK);
@@ -34,10 +32,11 @@ public abstract class CardStack extends JPanel implements Serializable{
                 redraw();
             }
         });
-        //this.addMouseListener(new CardClicked());
-
     }
 
+    /**
+     * Repaint/revalidate when stacks change
+     */
     private void redraw(){
         onContainerChange();
         revalidate();
@@ -50,9 +49,10 @@ public abstract class CardStack extends JPanel implements Serializable{
      */
     public abstract void onContainerChange();
 
-    /*
-     * If user is allowed to drop cards here return true, else false
-     * This does not indicate whether the card added is valid according to game rules
+    /**
+     * Returns true if user is allowed to drop cards, else false.
+     * Not based on game rules
+     * @return Allowed user drop
      */
     public abstract boolean allowUserDrop();
 
@@ -77,10 +77,11 @@ public abstract class CardStack extends JPanel implements Serializable{
 
     /**
      * Add card to specified index
+     * @param c Card to be added
+     * @param n Index to add to
      */
     public void addCard(CardTexture c, int n){
         this.add(c,n);
-        System.out.println("Adding card to index " + n);
         redraw();
         c.setVisible(true);
     }
@@ -97,7 +98,7 @@ public abstract class CardStack extends JPanel implements Serializable{
      * @param n Index of card
      * @return CardTexture removed from stack
      */
-    protected CardTexture removeCard(int n){
+    public CardTexture removeCard(int n){
         if(getNumCards()>0) {
             CardTexture c = (CardTexture) this.getComponent(n);
             this.remove(n);
@@ -108,45 +109,44 @@ public abstract class CardStack extends JPanel implements Serializable{
     }
 
 
-
-    public CardTexture getCardClicked(){
-        return (CardTexture)cardClicked;
-    }
-
+    /**
+     * Return index of card clicked in stack
+     * @return index of card clicked
+     */
     public int getCardClickedIndex(){
         return cardClickedIndex;
     }
 
-    public void setCardClickedIndex(int s){
-        cardClickedIndex = s;
-    }
-
-    public void setCardClicked(Component s){
-        cardClicked = s;
-    }
-
+    /**
+     * Return Y axis value of card clicked in reference to stack it's in
+     * @return Y value of card
+     */
     public int getCardClickedY(){
         return cardClickedY;
     }
 
+    /**
+     * Gets stack based on cards clicked
+     * @return Card stack clicked
+     */
     public abstract MoveStack getMoveStack();
 
+    /**
+     * Adds moved stack to this stack
+     * @param m stack to be added
+     */
     public void addCardStack(MoveStack m){
         int size = m.getNumCards();
         for(int i = 0; i < size; i++)
             this.addCard(m.removeCard());
     }
 
+    /**
+     * Find card clicked and set card index
+     * @param m Mouse event on clicked card stack
+     */
     public void setValues(MouseEvent m){
-        //NOTE: POSSIBLE BUGS.
-        //Keep an eye out for null pointer exceptions.
-        //NOTE AGAIN:  There ARE exceptions. Possible data loss.
-        //TODO: ADD TRY/CATCH
-       // Point p = m.getPoint();
-
-        //SwingUtilities.convertPointFromScreen(p, this);
         cardClicked = getComponentAt(m.getPoint());
-
         Container c = cardClicked.getParent();
 
         int j = getNumCards();
@@ -155,19 +155,18 @@ public abstract class CardStack extends JPanel implements Serializable{
                 cardClickedIndex = i;
         }
         cardClickedY = cardClicked.getY();
-        System.out.println("This: " + cardClicked.toString() + " and this " + cardClickedIndex);
         cardClicked.setVisible(true);
-
     }
 
-
-    private class CardClicked extends MouseAdapter implements Serializable{
-
-        @Override
-        public void mousePressed(MouseEvent m){
-
-        }
-
+    /**
+     * Make top card visible
+     */
+    public void showTopCard(){
+        if(this.getComponentCount() == 0)
+            return;
+        Component[] c = this.getComponents();
+        CardTexture card = (CardTexture)c[0];
+        card.showCard();
     }
 
 }
