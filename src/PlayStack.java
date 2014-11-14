@@ -8,14 +8,9 @@ import java.util.ArrayList;
  * Created by christopher on 11/5/14.
  */
 public class PlayStack extends CardStack implements Serializable{
-    private float count = 0f;
-    private int layer = 5;
-
-    private JLayeredPane cardLayers = new JLayeredPane();
 
     public PlayStack(){
         super();
-        count = 0f;
         setLayout(null);
     }
 
@@ -30,8 +25,6 @@ public class PlayStack extends CardStack implements Serializable{
         CardTexture c = removeCard(getCardClickedIndex());
         return c;
     }
-
-
 
     /*
      * If user is allowed to drop cards here, return true, else false
@@ -67,5 +60,17 @@ public class PlayStack extends CardStack implements Serializable{
         card.showCard();
     }
 
-
+    @Override
+    public MoveStack getMoveStack() {
+        System.out.println("Adding PlayStack");
+        MoveStack moveStack = new MoveStack();
+        int size = this.getCardClickedIndex();
+        for(int i = 0; i < size+1; i++) {
+            System.out.println("Size " + size);
+            moveStack.addCard(this.removeCard(size-i));
+            System.out.println("Removing index " + (size) );
+        }
+        this.repaint();
+        return moveStack;
+    }
 }

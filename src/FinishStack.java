@@ -26,4 +26,12 @@ public class FinishStack extends DiscardStack implements Serializable {
         return true;
     }
 
+    @Override
+    public MoveStack getMoveStack() {
+        MoveStack moveStack = new MoveStack();
+        moveStack.addCard(this.removeCard(0));
+        return null;
+    }
+
+
 }

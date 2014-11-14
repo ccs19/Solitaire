@@ -35,6 +35,9 @@ public class DiscardStack extends CardStack implements Serializable {
         return false;
     }
 
-
-
+    @Override
+    public MoveStack getMoveStack() {
+        MoveStack ms = new MoveStack();
+        return ms;
+    }
 }

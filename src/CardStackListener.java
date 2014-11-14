@@ -16,6 +16,8 @@ public class CardStackListener extends MouseAdapter implements Serializable {
     private CardGrid cardGrid = null;
     private JPanel backPanel = null;
 
+    private MoveStack dragStack = null;
+
     CardStackListener(CardGrid c) {
         super();
         cardGrid = c;
@@ -31,15 +33,14 @@ public class CardStackListener extends MouseAdapter implements Serializable {
     @Override
     public void mouseDragged(MouseEvent m){
         //Click offset so mouse pointer is in middle of card
-        wDiv = dragCard.getWidth() / 2;
-        hDiv = dragCard.getHeight() / 2;
-        MoveCard(dragCard, m.getPoint().x - wDiv, m.getPoint().y - hDiv);
+        //wDiv = dragCard.getWidth() / 2;
+        //hDiv = dragCard.getHeight() / 2;
+       // MoveCard(dragCard, m.getPoint().x - wDiv, m.getPoint().y - hDiv);
         //Repaint on drag to avoid card clipping
-        cardGrid.repaint();
+        //cardGrid.repaint();
+
+        MoveStack(dragStack, m.getPoint().x, m.getPoint().y);
     }
-
-
-
 
 
     /*
@@ -58,6 +59,19 @@ public class CardStackListener extends MouseAdapter implements Serializable {
         }
     }
 
+    private void setStackClicked(MouseEvent m){
+        clickedCardPanel = (CardStack) backPanel.getComponentAt(m.getPoint());
+        Component[] c = clickedCardPanel.getComponents();
+        if (c.length == 0)
+            return;
+        if (c[0] instanceof CardTexture) {
+            clickedCardPanel.setValues(SwingUtilities.convertMouseEvent(cardGrid, m, clickedCardPanel));
+            dragStack = clickedCardPanel.getMoveStack();
+            cardGrid.add(dragStack, JLayeredPane.DRAG_LAYER);
+            dragStack.repaint();
+        }
+    }
+
 
     //Allows fluid movement of card
     private void MoveCard(CardTexture c, int x, int y){
@@ -66,10 +80,18 @@ public class CardStackListener extends MouseAdapter implements Serializable {
         dragCard.repaint();
     }
 
+    private void MoveStack(MoveStack m, int x, int y){
+        m.setLocation(x,y);
+        m.repaint();
+    }
+
 
     //Puts card(s) back in original panel
     private void putCardBack(){
         clickedCardPanel.addCard(dragCard);
+    }
+    private void putStackBack(){
+        clickedCardPanel.addCardStack(dragStack);
     }
 
 }

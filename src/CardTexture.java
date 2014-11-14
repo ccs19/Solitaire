@@ -106,11 +106,8 @@ public class CardTexture extends JLabel implements Serializable{
 
 
     public void ResizeImageListener() {
-
         cardXSize = CardConstants.getNewCardSizeX();
         cardYSize = CardConstants.getNewCardSizeY();
-
-
 
         sizedImgUp = imgUp.getScaledInstance(cardXSize, cardYSize, Image.SCALE_SMOOTH);
         sizedImgDown = imgDown.getScaledInstance(cardXSize, cardYSize, Image.SCALE_SMOOTH);

@@ -19,6 +19,7 @@ public abstract class CardStack extends JPanel implements Serializable{
 
     CardStack(){
         super();
+        this.setBackground(Color.BLACK);
         Dimension d = new Dimension();
         d.setSize(CardConstants.getNewCardSizeX(), CardConstants.getNewCardSizeY());
         this.setPreferredSize(d);
@@ -68,15 +69,11 @@ public abstract class CardStack extends JPanel implements Serializable{
      * @param c card to add to stack
      */
     public void addCard(CardTexture c){
-
         this.add(c);
         redraw();
         c.setVisible(true);
     }
 
-    public void resetValues(){
-
-    }
 
     /**
      * Add card to specified index
@@ -85,6 +82,7 @@ public abstract class CardStack extends JPanel implements Serializable{
         this.add(c,n);
         System.out.println("Adding card to index " + n);
         redraw();
+        c.setVisible(true);
     }
 
     /**
@@ -92,10 +90,6 @@ public abstract class CardStack extends JPanel implements Serializable{
      * @return Card removed
      */
     public abstract CardTexture removeCard();
-
-    public CardTexture[] getMoveStack(){
-        return new CardTexture[13];
-    }
 
     /**
      * Removes and returns card by index
@@ -135,7 +129,13 @@ public abstract class CardStack extends JPanel implements Serializable{
         return cardClickedY;
     }
 
+    public abstract MoveStack getMoveStack();
 
+    public void addCardStack(MoveStack m){
+        int size = m.getNumCards();
+        for(int i = 0; i < size; i++)
+            this.addCard(m.removeCard());
+    }
 
     public void setValues(MouseEvent m){
         //NOTE: POSSIBLE BUGS.
@@ -159,6 +159,7 @@ public abstract class CardStack extends JPanel implements Serializable{
         cardClicked.setVisible(true);
 
     }
+
 
     private class CardClicked extends MouseAdapter implements Serializable{
 

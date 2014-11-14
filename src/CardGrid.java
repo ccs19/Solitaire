@@ -37,10 +37,8 @@ public class CardGrid extends JLayeredPane implements Serializable {
         backPanel.setSize(CARDGRIDSIZE);
         backPanel.setLocation(2 * SPACE, 2 * SPACE);
         backPanel.setBackground(Color.GREEN);
-       // gridBagConstraints.fill = GridBagConstraints.VERTICAL;
-       // gridBagConstraints.gridheight = 13;
-
-
+        this.setBackground(Color.GREEN);
+        this.setPreferredSize(CARDGRIDSIZE);
 
         //Create special card stacks
         cardGrid[0][1] = new DiscardStack();
@@ -68,7 +66,7 @@ public class CardGrid extends JLayeredPane implements Serializable {
         backPanel.setBorder(BorderFactory.createEmptyBorder(SPACE, SPACE, SPACE, SPACE));
         setPreferredSize(CARDGRIDSIZE);
         add(backPanel, JLayeredPane.DEFAULT_LAYER);
-        CardDrag mouseAdapter = new CardDrag();
+        CardGridListener mouseAdapter = new CardGridListener(this);
         addMouseListener(mouseAdapter);
         addMouseMotionListener(mouseAdapter);
     }
@@ -105,144 +103,6 @@ public class CardGrid extends JLayeredPane implements Serializable {
         return backPanel;
     }
 
-
-    //Mouse drag class
-    private class CardDrag extends MouseAdapter implements Serializable{
-
-        private CardTexture dragCard = null;
-        private int wDiv;
-        private int hDiv;
-        private CardStack clickedCardPanel = null;
-
-
-
-        @Override
-        public void mousePressed(MouseEvent m) {
-
-            try {
-                clickedCardPanel = (CardStack) backPanel.getComponentAt(m.getPoint());
-            }
-            catch(Exception E){
-                return;
-            }
-
-            Component[] c = clickedCardPanel.getComponents();
-            if(c.length == 0 )
-                return;
-            else if(clickedCardPanel instanceof CardStack) {
-               clickedCardPanel.setValues(SwingUtilities.convertMouseEvent(thisPane, m, clickedCardPanel));
-               dragCard = clickedCardPanel.removeCard();
-               add(dragCard, JLayeredPane.DRAG_LAYER);
-               dragCard.repaint();
-               mouseDragged(m);
-            }
-
-        }
-
-
-
-        //Animation for moving card.
-        @Override
-        public void mouseDragged(MouseEvent m){
-            try {
-                //Click offset so mouse pointer is in middle of card
-                wDiv = dragCard.getWidth() / 2;
-                hDiv = dragCard.getHeight() / 2;
-
-                MoveCard(dragCard, m.getPoint().x - wDiv, m.getPoint().y - hDiv);
-
-                //Repaint on drag to avoid card clipping
-                repaint();
-            }
-            catch(Exception e){
-                return;
-            }
-        }
-        @Override
-        public void mouseReleased(MouseEvent m){
-            CardStack dropLocation;
-            //If no valid click, do nothing, return
-            if(dragCard == null) {
-                return;
-            }
-
-            //Remove CardTexture from JPanel layer
-            remove(dragCard);
-
-
-            //If invalid drop location, put card back
-            try {
-                dropLocation = (CardStack) backPanel.getComponentAt(m.getPoint());
-            }
-            catch(Exception E){
-                putCardBack();
-                return;
-            }
-
-
-            int r, c, x;
-            r = c = x = -1;
-
-                //Check each card grid location to see if we're putting it
-                //in a valid JPanel
-                search:for(int row = 0; row < cardGrid.length; row++){
-                        for(int col = 0; col < cardGrid[row].length; col++){
-                            if(cardGrid[row][col] == dropLocation){
-                                r = row;
-                                c = col;
-                                break search;
-                            }
-                        }
-                    }
-                //If invalid card panel, put back in original panel
-                if(dropLocation.allowUserDrop() == false)
-                    putCardBack();
-                //else add to new destination
-                else if(dropLocation == clickedCardPanel)
-                    putCardBack();
-                else {
-                    dropLocation.addCard(dragCard);
-                    clickedCardPanel.repaint();
-                }
-
-
-        repaint();
-        dragCard = null;
-        }
-
-
-        //Allows fluid movement of card
-        private void MoveCard(CardTexture c, int x, int y){
-            c.setLocation(x, y);
-            c.repaint();
-            dragCard.repaint();
-        }
-
-
-        private void putCardBack(){
-            clickedCardPanel.addCard(dragCard, clickedCardPanel.getCardClickedIndex());
-        }
-
-        /**Figures out what card we're grabbing.
-         * Determines if we grab from a regular or special stack
-         * @param c Components in JLabel object; must be CardTexture objects
-         */
-        private void setDragCard(Component[] c, MouseEvent m){
-            //if (clickedCardPanel.toString().equals("DiscardStack") || clickedCardPanel.toString().equals("FinishStack")) {
-            //    dragCard = (CardTexture)c[c.length-1];
-            //    clickedCardPanel.remove(dragCard);
-            //}
-
-            //else {
-
-              //  PlayStack p = (PlayStack)clickedCardPanel;
-             //   dragCard = p.removeCard();
-             //   System.out.println("Card:" + dragCard.toString());
-           // }
-
-
-        }
-    }
 
 }
 

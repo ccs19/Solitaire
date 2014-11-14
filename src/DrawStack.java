@@ -19,6 +19,10 @@ public class DrawStack extends CardStack implements Serializable{
         this.addMouseListener(new clickStack());
     }
 
+    @Override
+    public MoveStack getMoveStack() {
+        return null;
+    }
 
     /**
      * Draw next card and place on DiscardStack

@@ -141,7 +141,7 @@ public class SolitaireWindow implements Serializable{
                 gameWindow.getContentPane().repaint();
             }
             catch(Exception e){
-                System.err.println("Error reading file" + e.getMessage());
+                System.err.println("Error reading file " + e.getMessage());
 
             }
         }
@@ -149,23 +149,6 @@ public class SolitaireWindow implements Serializable{
     }
 
 
-    private class redrawPage extends MouseAdapter {
 
-
-        @Override
-        public void mousePressed(MouseEvent m){
-            SwingUtilities.updateComponentTreeUI(gameWindow);
-            gameWindow.getContentPane().invalidate();
-            gameWindow.getContentPane().validate();
-            gameWindow.getContentPane().repaint();
-        }
-
-        @Override
-        public void mouseDragged(MouseEvent m){
-            mousePressed(m);
-
-        }
-
-    }
 
 }
