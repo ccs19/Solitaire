@@ -40,7 +40,7 @@ public class MoveStack extends CardStack implements Serializable {
 
     //UNUSED
     public CardTexture removeCard(){
-        return this.removeCard(0);
+        return this.removeCard(this.getNumCards()-1);
     }
 
     //UNUSED
