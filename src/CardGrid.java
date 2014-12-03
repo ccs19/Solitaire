@@ -20,6 +20,7 @@ public class CardGrid extends JLayeredPane implements Serializable {
     private static final int SPACE = 10;
     private static final Dimension CARDGRIDSIZE = new Dimension(WIDTH,HEIGHT);
     private static GridLayout gridLayout = new GridLayout(ROWS, COLUMNS, SPACE, SPACE);
+    private static GridLayout gridLayout2 = new GridLayout(1, COLUMNS, SPACE, SPACE);
     private static JPanel backPanel = null;
     private static JPanel[][] cardGrid = new JPanel[ROWS][COLUMNS];
 

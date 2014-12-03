@@ -82,8 +82,9 @@ public abstract class CardStack extends JPanel implements Serializable{
      */
     public void addCard(CardTexture c, int n){
         this.add(c,n);
-        redraw();
         c.setVisible(true);
+        redraw();
+
     }
 
     /**
@@ -102,6 +103,21 @@ public abstract class CardStack extends JPanel implements Serializable{
         if(getNumCards()>0) {
             CardTexture c = (CardTexture) this.getComponent(n);
             this.remove(n);
+            return c;
+        }
+        else
+            return null;
+    }
+
+
+    /**
+     * Returns card by index without removing from stack
+     * If empty, returns null
+     * @return card by index
+     */
+    public CardTexture getCard(int n){
+        if(getNumCards() > 0){
+            CardTexture c = (CardTexture) this.getComponent(n);
             return c;
         }
         else
@@ -131,6 +147,7 @@ public abstract class CardStack extends JPanel implements Serializable{
      */
     public abstract MoveStack getMoveStack();
 
+
     /**
      * Adds moved stack to this stack
      * @param m stack to be added
@@ -139,6 +156,8 @@ public abstract class CardStack extends JPanel implements Serializable{
         int size = m.getNumCards();
         for(int i = 0; i < size; i++)
             this.addCard(m.removeCard());
+        this.repaint();
+
     }
 
     /**
@@ -157,6 +176,8 @@ public abstract class CardStack extends JPanel implements Serializable{
         cardClickedY = cardClicked.getY();
         cardClicked.setVisible(true);
     }
+
+
 
     /**
      * Make top card visible

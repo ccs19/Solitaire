@@ -50,10 +50,12 @@ public class PlayStack extends CardStack implements Serializable{
      * Add card and place it according to number of cards in stack.
      * @param c card to add to stack
      */
+    @Override
     public void addCard(CardTexture c){
         c.setBounds(0, 25 * getNumCards(), c.getWidth(), c.getHeight());
         this.add(c);
         this.setComponentZOrder(c, 0);
+        c.setVisible(true);
     }
 
     /**
@@ -76,9 +78,50 @@ public class PlayStack extends CardStack implements Serializable{
     public MoveStack getMoveStack() {
         MoveStack moveStack = new MoveStack();
         int size = this.getCardClickedIndex();
+
+        CardTexture c = (CardTexture)this.getComponent(size);
+
+       // if(!c.isCardFaceUp())
+           // return null;
+
         for(int i = 0; i < size+1; i++) {
             moveStack.addCard(this.removeCard(size-i));
         }
+
         return moveStack;
     }
+
+    /**
+     * Attempts to add a dragged stack to the PlayStack
+     * Follows standard Solitaire rules
+     * @return False if invalid drop
+     */
+    public boolean addCardStackFinish(MoveStack m){
+        CardTexture dest = null, source = null;
+        try {
+            dest = this.getCard(0);
+            source = m.getCard(m.getNumCards() - 1);
+        }
+        catch(Exception e){
+
+        }
+        if(dest.getColor().equals(source.getColor()) && this.getNumCards() != 0)
+            return false;
+        else if(source.getVal() != dest.getVal() - 1 && this.getNumCards() != 0)
+            return false;
+        else if(this.getNumCards() == 0 && source.getVal() != 13)
+            return false;
+        else
+            this.addCardStack(m);
+        return true;
+    }
+
+    @Override
+    public void addCardStack(MoveStack m){
+        int size = m.getNumCards();
+        for(int i = 0; i < size; i++)
+            this.addCard(m.removeCard());
+        this.repaint();
+    }
+
 }

@@ -72,19 +72,22 @@ public class CardGridListener extends MouseAdapter implements Serializable {
         //If invalid card panel, put back in original panel
         try {
             dropLocation = (CardStack) backPanel.getComponentAt(m.getPoint());
-            if (dropLocation.allowUserDrop() == false || dropLocation == clickedCardPanel)
-                putStackBack();
-            else if(dropLocation.toString().equals("FinishStack")){
-                FinishStack f = (FinishStack)dropLocation;
-                valid = f.addCardStackFinish(dragStack);
-            }
-            else {
-                dropLocation.addCardStack(dragStack);
-            }
         }
         catch(Exception e){
             putStackBack();
             return;
+        }
+
+        if (dropLocation.allowUserDrop() == false || dropLocation == clickedCardPanel)
+            putStackBack();
+        else if(dropLocation.toString().equals("FinishStack")){
+            FinishStack f = (FinishStack)dropLocation;
+            valid = f.addCardStackFinish(dragStack);
+        }
+        else if(dropLocation.toString().equals("PlayStack")){
+            PlayStack p = (PlayStack)dropLocation;
+            valid = p.addCardStackFinish(dragStack);
+            p.repaint();
         }
 
         if(!valid)
@@ -145,7 +148,7 @@ public class CardGridListener extends MouseAdapter implements Serializable {
     }
 
     /**
-     * Puts a card back to its original stack.
+     * Puts a single card back to its original stack.
      */
     private void putCardBack(){
         clickedCardPanel.addCard(dragCard, clickedCardPanel.getCardClickedIndex());

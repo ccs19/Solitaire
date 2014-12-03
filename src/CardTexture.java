@@ -45,7 +45,6 @@ public class CardTexture extends JLabel implements Serializable{
 
     private ImageIcon faceUp;
     private static ImageIcon faceDown;
-    private String cardName;
 
     private Card card = null;
 
@@ -96,7 +95,7 @@ public class CardTexture extends JLabel implements Serializable{
      * @return name of card
      */
     public String toString(){
-        return cardName;
+        return card.toString();
     }
 
     /**
@@ -168,4 +167,19 @@ public class CardTexture extends JLabel implements Serializable{
     public int getHeight(){
         return cardYSize;
     }
+
+
+    /**
+     * Returns if card is faceup or not
+     * @return True if faceup, false if face down
+     */
+    public boolean isCardFaceUp(){
+        if(this.getIcon() == faceUp)
+            return true;
+        else
+            return false;
+    }
+
+
+
 }
