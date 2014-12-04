@@ -52,7 +52,7 @@ public class PlayStack extends CardStack implements Serializable{
      */
     @Override
     public void addCard(CardTexture c){
-        c.setBounds(0, 25 * getNumCards(), c.getWidth(), c.getHeight());
+        c.setBounds(0, 20 * getNumCards(), c.getWidth(), c.getHeight());
         this.add(c);
         this.setComponentZOrder(c, 0);
         c.setVisible(true);
@@ -81,8 +81,8 @@ public class PlayStack extends CardStack implements Serializable{
 
         CardTexture c = (CardTexture)this.getComponent(size);
 
-       // if(!c.isCardFaceUp())
-           // return null;
+       if(!c.isCardFaceUp())
+           return null;
 
         for(int i = 0; i < size+1; i++) {
             moveStack.addCard(this.removeCard(size-i));
@@ -98,18 +98,24 @@ public class PlayStack extends CardStack implements Serializable{
      */
     public boolean addCardStackFinish(MoveStack m){
         CardTexture dest = null, source = null;
-        try {
-            dest = this.getCard(0);
-            source = m.getCard(m.getNumCards() - 1);
-        }
-        catch(Exception e){
 
+        if(this.getNumCards() == 0){
+            source = m.getCard(m.getNumCards()-1);
+            int x = source.getVal();
+            if(source.getVal() == 12) {
+                this.addCardStack(m);
+                return true;
+            }
+            else return false;
         }
-        if(dest.getColor().equals(source.getColor()) && this.getNumCards() != 0)
+
+
+        dest = this.getCard(0);
+        source = m.getCard(m.getNumCards() - 1);
+
+        if(dest.getColor().equals(source.getColor()))
             return false;
-        else if(source.getVal() != dest.getVal() - 1 && this.getNumCards() != 0)
-            return false;
-        else if(this.getNumCards() == 0 && source.getVal() != 13)
+        else if(source.getVal() != dest.getVal() - 1)
             return false;
         else
             this.addCardStack(m);

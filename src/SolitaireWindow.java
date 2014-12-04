@@ -26,7 +26,8 @@ public class SolitaireWindow implements Serializable{
 
         //Calculate window size
         Dimension d = CardConstants.getScreenResolution();
-        gameWindow.setSize((int) ((double) d.getWidth() * (0.9)), (int) ((double) d.getHeight() * (0.9)));
+        //gameWindow.setSize((int) ((double) d.getWidth() * (0.9)), (int) ((double) d.getHeight() * (0.9)));
+        gameWindow.setSize(1024,815);
         initGameWindow();
 
     }

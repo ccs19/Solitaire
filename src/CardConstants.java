@@ -10,8 +10,8 @@ public final class CardConstants implements Serializable{
         Card Size Constants
      ===============================*/
 
-    private static int defaultCardXSize = 500;
-    private static int defaultCardYSize = 726;
+    private static int defaultCardXSize = 400;
+    private static int defaultCardYSize = 600;
     //Ratio 3.84x, 1.65y
     private static int numCards = 52;
 

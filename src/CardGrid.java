@@ -11,8 +11,8 @@ import java.io.Serializable;
 public class CardGrid extends JLayeredPane implements Serializable {
 
 
-    private static int WIDTH = 1300;
-    private static int HEIGHT = 1000;
+    private static int WIDTH = 1024;
+    private static int HEIGHT = 768;
 
 
     private static final int ROWS = 2;
@@ -20,7 +20,6 @@ public class CardGrid extends JLayeredPane implements Serializable {
     private static final int SPACE = 10;
     private static final Dimension CARDGRIDSIZE = new Dimension(WIDTH,HEIGHT);
     private static GridLayout gridLayout = new GridLayout(ROWS, COLUMNS, SPACE, SPACE);
-    private static GridLayout gridLayout2 = new GridLayout(1, COLUMNS, SPACE, SPACE);
     private static JPanel backPanel = null;
     private static JPanel[][] cardGrid = new JPanel[ROWS][COLUMNS];
 
@@ -34,10 +33,11 @@ public class CardGrid extends JLayeredPane implements Serializable {
     public CardGrid(SolitaireWindow s) {
         backPanel = new JPanel(gridLayout);
         backPanel.setSize(CARDGRIDSIZE);
-        backPanel.setLocation(2 * SPACE, 2 * SPACE);
         backPanel.setBackground(Color.GREEN);
         this.setBackground(Color.GREEN);
         this.setPreferredSize(CARDGRIDSIZE);
+
+
 
         //Create special card stacks
         cardGrid[0][1] = new DiscardStack();
@@ -61,6 +61,12 @@ public class CardGrid extends JLayeredPane implements Serializable {
 
         //Fill stacks with cards
         addAllCards();
+
+        //PlayStack ps = (PlayStack)cardGrid[1][1];
+
+        //ps.addCard(new CardTexture(47));
+        //ps.showTopCard();
+
         backPanel.setBorder(BorderFactory.createEmptyBorder(SPACE, SPACE, SPACE, SPACE));
         setPreferredSize(CARDGRIDSIZE);
         add(backPanel, JLayeredPane.DEFAULT_LAYER);

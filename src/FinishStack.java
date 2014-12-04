@@ -6,7 +6,7 @@ import java.io.Serializable;
  */
 public class FinishStack extends DiscardStack implements Serializable {
 
-    private String suit = null;
+    private String suit = "none";
     private int ACE = 13;
 
     FinishStack(){
@@ -18,7 +18,7 @@ public class FinishStack extends DiscardStack implements Serializable {
         if(m.getNumCards() > 1)
             return false;
         CardTexture card = (CardTexture)m.getComponent(0);
-        if(suit == null && card.getVal() == ACE){
+        if(suit.equals("none") && card.getVal() == ACE){
             suit = card.getSuit();
             this.addCardStack(m);
             return true;
@@ -36,7 +36,7 @@ public class FinishStack extends DiscardStack implements Serializable {
     @Override
     public void onContainerChange(){
         if(this.getNumCards() == 0)
-            suit = null;
+            suit = "none";
     }
     @Override
     public String toString(){
