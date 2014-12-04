@@ -35,6 +35,7 @@ public class CardGridListener extends MouseAdapter implements Serializable {
     @Override
     public void mousePressed(MouseEvent m) {
         setStackClicked(m);
+
         MoveStack(dragStack, m.getLocationOnScreen());
         cardGrid.repaint();
         //System.out.println("X: " + dragStack.getY() + " Y: " + dragStack.getX());
@@ -47,7 +48,7 @@ public class CardGridListener extends MouseAdapter implements Serializable {
     @Override
     public void mouseDragged(MouseEvent m){
         try {
-            MoveStack(dragStack, m.getPoint());
+            MoveStack(dragStack, m.getLocationOnScreen());
         }
         catch(Exception e){
             return;
@@ -78,7 +79,7 @@ public class CardGridListener extends MouseAdapter implements Serializable {
             return;
         }
 
-        if (dropLocation.allowUserDrop() == false || dropLocation == clickedCardPanel)
+        if (dropLocation == null || dropLocation.allowUserDrop() == false || dropLocation == clickedCardPanel )
             putStackBack();
         else if(dropLocation.toString().equals("FinishStack")){
             FinishStack f = (FinishStack)dropLocation;
@@ -144,6 +145,11 @@ public class CardGridListener extends MouseAdapter implements Serializable {
      */
     private void MoveStack(MoveStack ms, Point point){
         ms.setLocation(point);
+        int count = ms.getNumCards();
+        for(int i = 0; i < count; i++) {
+            ms.getComponent(i).setLocation(point.x + (i * 25), point.y);
+            ms.getComponent(i).repaint();
+        }
         ms.repaint();
     }
 
