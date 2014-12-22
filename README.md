@@ -10,6 +10,8 @@ several issues.
 You may use the code however you'd like, though I'd ask for you to give me credit. There are some poor design
 decisions, but I think the code's fairly easy to interpret and fully documented.
 
+=========
+
 Known bugs:
 
 -Game is slow to load
@@ -26,7 +28,7 @@ Known bugs:
 
 -Undoubtedly other bugs present :-)
 
-
+=========
 
 (As a side note, if you just happen to be a student tasked with writing a Solitaire game
 for a school project, use this for ideas and nothing else.)
